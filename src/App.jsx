@@ -1,28 +1,45 @@
-import { useState } from 'react'
+import { useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import HeroBackground from './components/HeroBackground';
+import HeroContent from './components/HeroContent';
+import ScrollIndicator from './components/ScrollIndicator';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { scrollYProgress } = useScroll();
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
+  const bgTranslateY = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const headlineScale = useTransform(scrollYProgress, [0, 1], [1, 0.85]);
+  const headlineOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
+
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
-        </div>
-      </div>
-    </div>
-  )
-}
+    <div className="relative min-h-screen bg-[#1A1A1A] overflow-x-hidden">
+      {/* Background: Spline + gradient mesh */}
+      <motion.div style={{ scale: bgScale, y: bgTranslateY }} className="absolute inset-0">
+        <HeroBackground />
+      </motion.div>
 
-export default App
+      {/* Foreground content with scroll transforms */}
+      <motion.div style={{ scale: headlineScale, opacity: headlineOpacity }}>
+        <HeroContent />
+      </motion.div>
+
+      <ScrollIndicator />
+
+      {/* spacer to allow scroll effects */}
+      <section id="framework" className="relative z-10 min-h-[120vh] bg-gradient-to-b from-transparent to-[#0f0f0f]">
+        <div className="mx-auto max-w-6xl px-6 md:px-10 py-32">
+          <h2 className="font-['Playfair_Display',serif] text-3xl md:text-5xl text-[#FAFAFA] mb-6">The Framework</h2>
+          <p className="text-[#c9c9c9] md:w-2/3 leading-relaxed">
+            Our lab merges cognitive science and aesthetics to systematically engineer attention,
+            emotion, and action. Below, experience principle-by-principle interactions that
+            demonstrate how micro-perceptions compound into measurable outcomes.
+          </p>
+        </div>
+      </section>
+    </div>
+  );
+}
